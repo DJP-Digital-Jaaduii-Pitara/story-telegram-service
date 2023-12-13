@@ -6,6 +6,8 @@ from telegram import __version__ as TG_VER
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, CallbackQueryHandler
 import os
+from logger import logger
+from dotenv import load_dotenv
 
 # bot_name = @harrypotter_gryf_bot
 
@@ -15,7 +17,7 @@ set_engine - To choose the engine
 set_language - To choose language of your choice
 """
 
-uuid_number = os.environ['uuid']
+load_dotenv()
 
 bot = Bot(token=os.environ['token'])
 TELEGRAM_BOT_NAME=os.environ["botName"]
@@ -30,33 +32,6 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"{TG_VER} version of this example, "
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
-
-# Enable logging
-# Example of logging levels
-# logger.debug('debug message')
-# logger.info('info message')
-# logger.warning('warn message')
-# logger.error('error message')
-# logger.critical('critical message')
-
-logger = logging.getLogger(os.environ['botName'])
-
-logger.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-fh = logging.FileHandler('./logs/' + TELEGRAM_BOT_NAME + '.log')
-fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-# add the handlers to logger
-logger.addHandler(ch)
-logger.addHandler(fh)
-
-
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
@@ -100,12 +75,14 @@ async def preferred_engine_callback(update: Update, context: CallbackContext):
 
 
 async def language_handler(update: Update):
-    english_button = InlineKeyboardButton('English', callback_data='lang_English')
-    hindi_button = InlineKeyboardButton('Hindi', callback_data='lang_Hindi')
-    kannada_button = InlineKeyboardButton('Kannada', callback_data='lang_Kannada')
-    telugu_button = InlineKeyboardButton('Telugu', callback_data='lang_Telugu')
-
-    inline_keyboard_buttons = [[english_button], [hindi_button], [kannada_button], [telugu_button]]
+    inline_keyboard_buttons = [
+        [InlineKeyboardButton('English', callback_data='lang_English')], [InlineKeyboardButton('বাংলা', callback_data='lang_Bengali')], 
+        [InlineKeyboardButton('ગુજરાતી', callback_data='lang_Gujarati')], [InlineKeyboardButton('हिंदी', callback_data='lang_Hindi')],
+        [InlineKeyboardButton('ಕನ್ನಡ', callback_data='lang_Kannada')], [InlineKeyboardButton('മലയാളം', callback_data='lang_Malayalam')],
+        [InlineKeyboardButton('मराठी', callback_data='lang_Marathi')], [InlineKeyboardButton('ଓଡ଼ିଆ', callback_data='lang_Oriya')],
+        [InlineKeyboardButton('ਪੰਜਾਬੀ', callback_data='lang_Punjabi')], [InlineKeyboardButton('தமிழ்', callback_data='lang_Tamil')],
+        [InlineKeyboardButton('తెలుగు', callback_data='lang_Telugu')]
+        ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard_buttons)
 
     await bot.send_message(chat_id=update.effective_chat.id, text="Choose a Language:", reply_markup=reply_markup)
@@ -146,35 +123,20 @@ async def get_query_response(engine: str, query: str, voice_message_url: str, vo
     _domain = os.environ['upstream']
     try:
         if voice_message_url is None:
-            if voice_message_language == "English":
-                query_engine_route = 'query-with-langchain' if engine == 'engine_langchain_gpt3' else 'query-with-langchain-gpt4'
-                params = {
-                    'uuid_number': uuid_number,
-                    'query_string': query,
-                }
-
-                url = f'{_domain}/{query_engine_route}?' \
-                      + urllib.parse.urlencode(params)
-            else:
-                params = {
-                    'uuid_number': uuid_number,
+            params = {
                     'query_text': query,
                     'audio_url': "",
                     'input_language': voice_message_language,
                     'output_format': 'Text',
-                }
-                url = f'{_domain}/query-using-voice?' \
-                      + urllib.parse.urlencode(params)
+            }
         else:
             params = {
-                'uuid_number': uuid_number,
                 'audio_url': voice_message_url,
                 'input_language': voice_message_language,
                 'output_format': 'Voice',
             }
-            url = f'{_domain}/query-using-voice?' \
+        url = f'{_domain}/query-using-voice?' \
                   + urllib.parse.urlencode(params)
-
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()

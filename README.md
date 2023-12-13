@@ -7,15 +7,15 @@ The Jugalbandi Telegram Bot is a Python-based bot that interacts with the Jugalb
 - Python
 - Telegram Bot API token
 - Telegram Bot Name
-- Jugalbandi API Server URL
-- Context based UUID
+- Story API Server URL
+- Log Level
 
 ## Installation
 
 1. Clone the repository
 
    ```bash
-   https://github.com/rajeshkumaravel/jugalbandi-telegram
+   git clone https://github.com/DJP-Digital-Jaaduii-Pitara/story-telegram-service.git
 
 2. Install required python packages
 
@@ -24,10 +24,10 @@ The Jugalbandi Telegram Bot is a Python-based bot that interacts with the Jugalb
 
 3. Set up the configuration
 
-   - uuid
    - token
    - botName
    - upstream
+   - logLevel - (DEBUG, INFO, ERROR)
    - promptMsg (optional)
 
 5. Start the Telegram bot
