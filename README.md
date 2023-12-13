@@ -1,4 +1,4 @@
-# Jugalbandi Telegram Bot
+# Sakhi Story Telegram Bot
 
 The Jugalbandi Telegram Bot is a Python-based bot that interacts with the Jugalbandi API Server via Telegram. It allows users to perform various actions and access information from the API Server through the convenience of a Telegram chat interface.
 
