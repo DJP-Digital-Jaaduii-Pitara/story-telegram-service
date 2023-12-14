@@ -129,7 +129,7 @@ async def get_query_response(engine: str, query: str, voice_message_url: str, vo
                     "text": query
                 },
                 "output": {
-                    'output_format': 'text'
+                    'format': 'text'
                 }
             }
         else:
@@ -139,7 +139,7 @@ async def get_query_response(engine: str, query: str, voice_message_url: str, vo
                     "audio": voice_message_url
                 },
                 "output": {
-                    'output_format': 'audio'
+                    'format': 'audio'
                 }
             }
         url = f'{_domain}/v1/query'
