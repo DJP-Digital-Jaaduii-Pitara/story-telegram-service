@@ -1,5 +1,4 @@
-import logging
-import urllib
+import json
 from typing import Union, TypedDict
 import requests
 from telegram import __version__ as TG_VER
@@ -110,10 +109,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 class ApiResponse(TypedDict):
-    query: str
-    answer: str
-    source_text: str
-
+    output: any
 
 class ApiError(TypedDict):
     error: Union[str, requests.exceptions.RequestException]
@@ -123,7 +119,7 @@ async def get_query_response(engine: str, query: str, voice_message_url: str, vo
     _domain = os.environ['upstream']
     try:
         if voice_message_url is None:
-            reqBody = {
+            reqBody = json.dumps({
                 "input": {
                     "language": voice_message_language,
                     "text": query
@@ -131,9 +127,9 @@ async def get_query_response(engine: str, query: str, voice_message_url: str, vo
                 "output": {
                     'format': 'text'
                 }
-            }
+            })
         else:
-            reqBody = {
+            reqBody = json.dumps({
                 "input": {
                     "language": voice_message_language,
                     "audio": voice_message_url
@@ -141,9 +137,9 @@ async def get_query_response(engine: str, query: str, voice_message_url: str, vo
                 "output": {
                     'format': 'audio'
                 }
-            }
+            })
         url = f'{_domain}/v1/query'
-        response = requests.post(url, reqBody)
+        response = requests.post(url, data=reqBody)
         response.raise_for_status()
         data = response.json()
         return data
@@ -159,7 +155,7 @@ async def response_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def query_handler(update: Update, context: CallbackContext):
     engine = context.user_data.get('engine')
-    voice_message_language = context.user_data.get('language')
+    voice_message_language = context.user_data.get('language') or 'en'
     voice_message = None
     query = None
 
